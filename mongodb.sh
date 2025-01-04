@@ -30,10 +30,29 @@ then
     exit 1
 
 else
-    echo -e "$G you are root user$N"
+    echo -e "$N you are $G root user$N"
 fi
 
 cp mongo.repo /etc/yum.repos.d/ &>> $LOGFILE
 
 VALIDATE $? "copied mongodb repo"
 
+dnf install mongodb-org -y &>> $LOGFILE
+
+VALIDATE $? "Installing MongoDB"
+
+systemctl enable mongod &>> $LOGFILE
+
+VALIDATE $? "Enabling MongoDB"
+
+systemctl start mongod &>> $LOGFILE
+
+VALIDATE $? "Starting MongoDB"
+
+sed -i 's/127.0.0.0/0.0.0.0/g' /etc/mongod.conf &>> $LOGFILE
+
+VALIDATE $? "Remote access to MongoDB"
+
+systemctl restart mongod &>> $LOGFILE
+
+VALIDATE $? "Resatrting MongoDB"
